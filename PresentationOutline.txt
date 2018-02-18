@@ -1,0 +1,21 @@
+Case Study 1 Outline:
+
+Introduction to Project
+
+Statistics
+  
+1.  Report the number of NA’s in each column
+2.  Number of Breweries by State
+3.  Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+4.  Which state has the maximum alcoholic (ABV) beer? 
+5.  Which state has the most bitter (IBU) beer?
+6.  Summary statistics for the ABV variable
+7.  Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot. You are welcome to use the ggplot2 library for graphs. Please ignore missing values in your analysis. Make your best judgment of a relationship and EXPLAIN your answer.
+
+Summarize the findings
+
+  
+Appendix
+  code and definition of the code chunks
+  
+  
