@@ -1,0 +1,75 @@
+---
+title: 'Codebook for Case Study 1: Beer and Breweries'
+author: "Caroll Rodriguez, Amy Paschal, Aaron Tomkins"
+date: "2/16/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Repository
+#### https://github.com/atomkins/CaseStudy1
+
+# Raw Data
+#### The raw data for this project consists of two text files called Beers.csv and Breweries.csv. These files were obtained from the client.
+
+## Beers.csv
+* Contains a list of 2410 US craft beers.
+* Is a comma separated, text file with the header: Name,Beer_ID,ABV,IBU,Brewery_id,Style,Ounces
+* Each row contains the following columns:
+
+Header | Contents
+--- | --- 
+Name | Name of the beer.
+Beer ID | Unique identifier of the beer.
+ABV | Alcohol by volume of the beer.
+IBU | International Bitterness Units of the beer.
+Brewery ID | Brewery id associated with the beer.
+Style | Style of the beer.
+Ounces | Ounces of beer.
+
+## Breweries.csv
+* Contains a list of 558 US breweries.
+* Is a comma separated, text file with the header: Brew_ID,Name,City,State
+* Each row contains the following columns:
+
+Header | Contents
+--- | --- 
+Brew ID | Unique identifier of the brewery.
+Name | Name of the brewery.
+City | City where the brewery is located.
+State | U.S. State where the brewery is located.
+
+# Objects
+#### The objects created by this project are as follows:
+
+## master 
+* Contains a merged list of craft beers and breweries.
+* Is a data frame with the following columns:
+
+Column Name | Class | Meaning
+--- | --- | ---
+Beer_ID | integer | Unique identifier of the beer.
+Beer_Name | character | Name of beer.
+ABV | numeric | Alcohol by volume of the beer.
+IBU | integer | International Bitterness Units of the beer.
+Style | factor | Style of the beer.
+Ounces | numeric | Ounces of beer in typical packaging.
+Brewery_ID | integer | Unique identifier of the brewery.
+Brewery_Name | character | Name of the brewery.
+City | character | City where the brewery is located.
+State | factor |  U.S. State where the brewery is located.
+
+# Output files created by this project are as follows:
+### casesudy1_MS6306_sec402.html
+#### HTML file created by running makefile.R
+
+### Cookbook.html
+#### HTML file created by running makefile.R
+
+# Instructions
+1. Load Makefile.R into R Studio
+2. Click on the Source button
+3. View output files of interest in your favorite text file reader
