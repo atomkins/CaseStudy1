@@ -10,6 +10,4 @@
 ## Instructions
 1. Load Makefile.R into R studio.
 2. Click on the Source button
-3. View output files of interest in your favorite text file reader
-
-
+3. View output files of interest in your favorite text file reader or browser
