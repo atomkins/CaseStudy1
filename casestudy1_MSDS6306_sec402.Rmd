@@ -1,0 +1,34 @@
+---
+title: 'Case Study 1: Beer and Breweries'
+author: "Caroll Rodriguez, Amy Paschal, Aaron Tomkins"
+date: "2/16/2018"
+output: html_document
+---
+
+### Loading and merging data . . .
+
+```{r tidyData, echo=TRUE}
+# load Beers.csv, setting data types
+classProfile <- c("character", "integer", "numeric", "integer", "integer", "factor", "numeric")
+beers <- read.csv("Beers.csv", colClasses = classProfile, na.strings = "")
+# further specify Name column in beers
+names(beers)[names(beers) == "Name"] <- "Beer_Name"
+
+# load Breweries.csv, setting data types
+classProfile <- c("integer","character", "character", "factor")
+breweries <- read.csv("Breweries.csv", colClasses = classProfile, na.strings = "")
+# further specify Name column in breweries
+names(breweries)[names(breweries) == "Name"] <- "Brewery_Name"
+
+master <- merge(beers, breweries, by.x="Brewery_id", by.y="Brew_ID", all=TRUE)
+# reorder columns
+master <- master[c("Beer_ID", "Beer_Name", "ABV", "IBU", "Style", "Ounces", "Brewery_id", "Brewery_Name", "City", "State" )]
+# normalize column names
+names(master)[names(master) == "Brewery_id"] <- "Brewery_ID"
+# sort rows by beer ID
+master <- master[order(master$Beer_ID),]
+
+# head and tail of master
+head(master, 6)
+tail(master, 6)
+```
