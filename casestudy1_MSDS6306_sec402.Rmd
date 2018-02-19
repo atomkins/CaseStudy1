@@ -1,0 +1,86 @@
+---
+title: 'Case Study 1: Beer and Breweries'
+author: "Caroll Rodriguez, Amy Paschal, Aaron Tomkins"
+date: "2/16/2018"
+output: html_document
+---
+
+### Loading and merging data . . .
+
+```{r tidyData, echo=TRUE}
+# load Beers.csv, setting data types
+classProfile <- c("character", "integer", "numeric", "integer", "integer", "factor", "numeric")
+beers <- read.csv("Beers.csv", colClasses = classProfile, na.strings = "")
+# further specify Name column in beers
+names(beers)[names(beers) == "Name"] <- "Beer_Name"
+
+# load Breweries.csv, setting data types
+classProfile <- c("integer","character", "character", "factor")
+breweries <- read.csv("Breweries.csv", colClasses = classProfile, na.strings = "")
+# further specify Name column in breweries
+names(breweries)[names(breweries) == "Name"] <- "Brewery_Name"
+
+master <- merge(beers, breweries, by.x="Brewery_id", by.y="Brew_ID", all=TRUE)
+# reorder columns
+master <- master[c("Beer_ID", "Beer_Name", "ABV", "IBU", "Style", "Ounces", "Brewery_id", "Brewery_Name", "City", "State" )]
+# normalize column names
+names(master)[names(master) == "Brewery_id"] <- "Brewery_ID"
+# sort rows by beer ID
+master <- master[order(master$Beer_ID),]
+
+# head and tail of master
+head(master, 6)
+tail(master, 6)
+```
+
+# Questions
+
+1. How many breweries are present in each state?
+<br /><b>The number of breweries in each state is given in the table below.</b>
+```{r, echo=TRUE}
+table(master$State, useNA = "no")
+```
+
+2. Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
+<br /><b>The first and last six observations are printed below.</b>
+```{r, echo=TRUE}
+# The two tables were already merged in the data cleaning process (see first section above).
+head(master, 6)
+tail(master, 6)
+```
+
+3. Report the number of NA's in each column.
+<br /><b>Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero.</b>
+```{r, echo=TRUE}
+sapply(master, function(x) sum(is.na(x)))
+```
+
+4. Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+<br /><b>The bar chart with the median ABV and IBU per state is given below.</b>
+```{r, echo=TRUE}
+ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
+names(ibu.med) <- c("State","IBU")
+abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
+names(abv.med) <- c("State","ABV")
+
+barplot(ibu.med$IBU, names.arg = ibu.med$State, beside = TRUE, main = "Median IBU by State", xlab = "State", ylab = "Median IBU", col = "Blue")
+barplot(abv.med$ABV, names.arg = abv.med$ABV, beside = TRUE, main = "Median ABV by State", xlab = "State", ylab = "Median ABV", col = "Blue")
+```
+
+5. Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
+<br /><b>Colorado has the maximum ABV and Oregon has the most bitter beer.</b>
+```{r}
+master[which.max(master$ABV),][,10]
+master[which.max(master$IBU),][,10]
+```
+
+6. Summary statistics for the ABV variable.
+```{r}
+summary(master$ABV)
+```
+
+7. Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
+<br /><b>Per below, there is a positive linear relationship between ABV and IBU.</b>
+```{r}
+plot(master$ABV ~ master$IBU, main = "ABV to IBU", ylab = "ABV", xlab = "IBU")
+```
