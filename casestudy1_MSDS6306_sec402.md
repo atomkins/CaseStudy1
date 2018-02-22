@@ -6,8 +6,11 @@ output:
     html_document:
       keep_md: true
 ---
-### 
-#### The following code chunk pulls in two .csv files provided by the client into R. The files are then merged the Brewery Id Primary key. A sample of the data is shown below.
+#Introduction
+<p>Insert Introduction statement here</p>
+
+<b>Datasets</b>
+<p>The following code chunk pulls in two .csv files provided by the client into R. The files are then merged utilizing the Brewery Id as the Primary key. A series of steps to clean the data from abnormalities is performed. Then, column headings and data types for each column are normalized. A sample of the data is shown below.</p>
 
 
 ```r
@@ -80,10 +83,10 @@ tail(master, 6)
 ## 1     16          1 NorthGate Brewing  Minneapolis    MN
 ```
 
-# Questions
+# Analysis
 
-1. How many breweries are present in each state?
-<br /><b>The number of breweries in each state is given in the table below.</b>
+<br /><b>Number of Breweries by State</b>
+<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO and CA.</p>
 
 ```r
 table(master$State, useNA = "no")
@@ -100,7 +103,7 @@ table(master$State, useNA = "no")
 ```
 
 2. Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
-<br /><b>The first and last six observations are printed below.</b>
+<br /><b>Printed below are the first and last 6 records of the merged dataset. This view allows us to check for abnormalities in the merged data.</b>
 
 ```r
 # The two tables were already merged in the data cleaning process (see first section above).
@@ -181,7 +184,7 @@ barplot(ibu.med$IBU, names.arg = ibu.med$State, beside = TRUE, main = "Median IB
 ![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
 ```r
-barplot(abv.med$ABV, names.arg = abv.med$ABV, beside = TRUE, main = "Median ABV by State", xlab = "State", ylab = "Median ABV", col = "Blue")
+barplot(abv.med$ABV, names.arg = abv.med$State, beside = TRUE, main = "Median ABV by State", xlab = "State", ylab = "Median ABV", col = "Blue")
 ```
 
 ![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
