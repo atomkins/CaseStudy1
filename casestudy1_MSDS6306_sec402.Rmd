@@ -1,11 +1,13 @@
 ---
-title: 'Case Study 1: Beer and Breweries'
-author: "Caroll Rodriguez, Amy Paschal, Aaron Tomkins"
+title: 'An Analysis of the Breweries and their Beers in the United States'
+author: "Caroll Rodriguez and Aaron Tomkins"
 date: "2/16/2018"
-output: html_document
+output: 
+    html_document:
+      keep_md: true
 ---
-
-### Loading and merging data . . .
+### 
+#### The following code chunk pulls in two .csv files provided by the client into R. The files are then merged the Brewery Id Primary key. A sample of the data is shown below.
 
 ```{r tidyData, echo=TRUE}
 # load Beers.csv, setting data types
