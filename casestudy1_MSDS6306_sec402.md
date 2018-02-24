@@ -16,17 +16,25 @@ output:
 ```r
 # load Beers.csv, setting data types
 classProfile <- c("character", "integer", "numeric", "integer", "integer", "factor", "numeric")
-beers <- read.csv("Beers.csv", colClasses = classProfile, na.strings = "")
+beers <- read.csv("Beers.csv", colClasses = classProfile, na.strings = "", strip.white = TRUE)
 # further specify Name column in beers
 names(beers)[names(beers) == "Name"] <- "Beer_Name"
 
 # load Breweries.csv, setting data types
 classProfile <- c("integer","character", "character", "factor")
-breweries <- read.csv("Breweries.csv", colClasses = classProfile, na.strings = "")
+breweries <- read.csv("Breweries.csv", colClasses = classProfile, na.strings = "", strip.white = TRUE)
 # further specify Name column in breweries
 names(breweries)[names(breweries) == "Name"] <- "Brewery_Name"
 
 master <- merge(beers, breweries, by.x="Brewery_id", by.y="Brew_ID", all=TRUE)
+sum(duplicated(master$Beer_ID)) # shows that the merge did not produce duplicates
+```
+
+```
+## [1] 0
+```
+
+```r
 # reorder columns
 master <- master[c("Beer_ID", "Beer_Name", "ABV", "IBU", "Style", "Ounces", "Brewery_id", "Brewery_Name", "City", "State" )]
 # normalize column names
@@ -74,32 +82,34 @@ tail(master, 6)
 ## 3    2690    Wall's End 0.048  19                   English Brown Ale
 ## 2    2691 Maggie's Leap 0.049  26                  Milk / Sweet Stout
 ## 1    2692  Get Together 0.045  50                        American IPA
-##   Ounces Brewery_ID       Brewery_Name        City State
-## 6     16          1 NorthGate Brewing  Minneapolis    MN
-## 5     16          1 NorthGate Brewing  Minneapolis    MN
-## 4     16          1 NorthGate Brewing  Minneapolis    MN
-## 3     16          1 NorthGate Brewing  Minneapolis    MN
-## 2     16          1 NorthGate Brewing  Minneapolis    MN
-## 1     16          1 NorthGate Brewing  Minneapolis    MN
+##   Ounces Brewery_ID      Brewery_Name        City State
+## 6     16          1 NorthGate Brewing Minneapolis    MN
+## 5     16          1 NorthGate Brewing Minneapolis    MN
+## 4     16          1 NorthGate Brewing Minneapolis    MN
+## 3     16          1 NorthGate Brewing Minneapolis    MN
+## 2     16          1 NorthGate Brewing Minneapolis    MN
+## 1     16          1 NorthGate Brewing Minneapolis    MN
 ```
 
 # Analysis
 
+1. How many breweries are present in each state?
 <br /><b>Number of Breweries by State</b>
 <p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO and CA.</p>
 
 ```r
-table(master$State, useNA = "no")
+unique.master <- master[!duplicated(master$Brewery_ID),]
+table(unique.master$State, useNA = "no")
 ```
 
 ```
 ## 
-##  AK  AL  AR  AZ  CA  CO  CT  DC  DE  FL  GA  HI  IA  ID  IL  IN  KS  KY 
-##  25  10   5  47 183 265  27   8   2  58  16  27  30  30  91 139  23  21 
-##  LA  MA  MD  ME  MI  MN  MO  MS  MT  NC  ND  NE  NH  NJ  NM  NV  NY  OH 
-##  19  82  21  27 162  55  42  11  40  59   3  25   8   8  14  11  74  49 
-##  OK  OR  PA  RI  SC  SD  TN  TX  UT  VA  VT  WA  WI  WV  WY 
-##  19 125 100  27  14   7   6 130  26  40  27  68  87   2  15
+## AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO 
+##  7  3  2 11 39 47  8  1  2 15  7  4  5  5 18 22  3  4  5 23  7  9 32 12  9 
+## MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN TX UT VA VT WA WI WV 
+##  2  9 19  1  5  3  3  4  2 16 15  6 29 25  5  4  1  3 28  4 16 10 23 20  1 
+## WY 
+##  4
 ```
 
 2. Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
@@ -146,13 +156,13 @@ tail(master, 6)
 ## 3    2690    Wall's End 0.048  19                   English Brown Ale
 ## 2    2691 Maggie's Leap 0.049  26                  Milk / Sweet Stout
 ## 1    2692  Get Together 0.045  50                        American IPA
-##   Ounces Brewery_ID       Brewery_Name        City State
-## 6     16          1 NorthGate Brewing  Minneapolis    MN
-## 5     16          1 NorthGate Brewing  Minneapolis    MN
-## 4     16          1 NorthGate Brewing  Minneapolis    MN
-## 3     16          1 NorthGate Brewing  Minneapolis    MN
-## 2     16          1 NorthGate Brewing  Minneapolis    MN
-## 1     16          1 NorthGate Brewing  Minneapolis    MN
+##   Ounces Brewery_ID      Brewery_Name        City State
+## 6     16          1 NorthGate Brewing Minneapolis    MN
+## 5     16          1 NorthGate Brewing Minneapolis    MN
+## 4     16          1 NorthGate Brewing Minneapolis    MN
+## 3     16          1 NorthGate Brewing Minneapolis    MN
+## 2     16          1 NorthGate Brewing Minneapolis    MN
+## 1     16          1 NorthGate Brewing Minneapolis    MN
 ```
 
 3. Report the number of NA's in each column.
@@ -197,8 +207,8 @@ master[which.max(master$ABV),][,10]
 ```
 
 ```
-## [1]  CO
-## 51 Levels:  AK  AL  AR  AZ  CA  CO  CT  DC  DE  FL  GA  HI  IA  ID ...  WY
+## [1] CO
+## 51 Levels: AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA ... WY
 ```
 
 ```r
@@ -206,8 +216,8 @@ master[which.max(master$IBU),][,10]
 ```
 
 ```
-## [1]  OR
-## 51 Levels:  AK  AL  AR  AZ  CA  CO  CT  DC  DE  FL  GA  HI  IA  ID ...  WY
+## [1] OR
+## 51 Levels: AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA ... WY
 ```
 
 6. Summary statistics for the ABV variable.
