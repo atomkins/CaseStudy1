@@ -1,5 +1,5 @@
 ---
-title: ' '
+title: 'Analysis of the Breweries and their Beers in the United States'
 author: "Caroll Rodriguez and Aaron Tomkins"
 date: "2/16/2018"
 output: 
@@ -7,76 +7,118 @@ output:
       keep_md: true
 ---
 #Introduction
-<p>Insert Introduction statement here</p>
+<p> </p>
 
-<b>Datasets</b>
-<p>
-We were provided two datasets by the client.
+<b>Dataset Provided</b>
+<p>Two datasets were provided by the client. One file contains a list of all Breweries in the US plus District of Columbia. 
+The other file contains a list of Breweries and the craft beers they produce with the ABV, IBV, and Style indication.
 
-<p>We built code that pulls in two .csv files, which were provided by the client, into a program called R. These .csv files were merged utilizing the Brewery Id as the Primary key. Merging these files provides a complete list of Breweries, their craft beers, A series of steps to clean the data from abnormalities is performed. Then, column headings and data types for each column are normalized. A sample of the data is shown below.</p>
+<b>Data Merge and Cleaning</b>
+<p>The code we created imports the two .csv files, provided by the client, into a program called R. In the R program, these .csv files are merged utilizing the Brewery Id as the common field between the files. 
+Merging these files provides a complete list of Breweries and the craft beers they produce with associated attributes from both files. 
+A series of steps to clean the data from abnormalities is performed like the removal of whitespace, and column headings normalized. A sample of the data is shown below.</p>
 
 ```{r tidyData, echo=TRUE}
 # load Beers.csv, setting data types
 classProfile <- c("character", "integer", "numeric", "integer", "integer", "factor", "numeric")
 beers <- read.csv("Beers.csv", colClasses = classProfile, na.strings = "", strip.white = TRUE)
+
 # further specify Name column in beers
 names(beers)[names(beers) == "Name"] <- "Beer_Name"
 
 # load Breweries.csv, setting data types
 classProfile <- c("integer","character", "character", "factor")
 breweries <- read.csv("Breweries.csv", colClasses = classProfile, na.strings = "", strip.white = TRUE)
+
 # further specify Name column in breweries
 names(breweries)[names(breweries) == "Name"] <- "Brewery_Name"
 
+#merge of beers and breweries files
 master <- merge(beers, breweries, by.x="Brewery_id", by.y="Brew_ID", all=TRUE)
-sum(duplicated(master$Beer_ID)) # shows that the merge did not produce duplicates
+```
+
+<b>Number of duplicates in Master file</b>
+```{r echo=TRUE}
+# shows that the merge did not produce duplicates
+sum(duplicated(master$Beer_ID)) 
+
 # reorder columns
 master <- master[c("Beer_ID", "Beer_Name", "ABV", "IBU", "Style", "Ounces", "Brewery_id", "Brewery_Name", "City", "State" )]
+
 # normalize column names
 names(master)[names(master) == "Brewery_id"] <- "Brewery_ID"
+
 # sort rows by beer ID
 master <- master[order(master$Beer_ID),]
-
-# head and tail of master
-head(master, 6)
-tail(master, 6)
 ```
+
 
 # Analysis
 
-1. How many breweries are present in each state?
-<br /><b>Number of Breweries by State</b>
-<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO and CA.</p>
+<b>Client Request:</b> How many breweries are present in each state?
+<br />
+<b>Number of Breweries by State</b>
+<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO.</p>
 ```{r, echo=TRUE}
 unique.master <- master[!duplicated(master$Brewery_ID),]
-table(unique.master$State, useNA = "no")
+sort.unique.master <- table(unique.master$State, useNA = "no")
+sort(sort.unique.master, decreasing = TRUE)
+sort.unique.master
 ```
 
-2. Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
-<br /><b>Printed below are the first and last 6 records of the merged dataset. This view allows us to check for abnormalities in the merged data.</b>
-```{r, echo=TRUE}
-# The two tables were already merged in the data cleaning process (see first section above).
+<b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
+<br />
+<b>Sample of first and last 6 rows in Master file</b>
+```{r echo=TRUE}
+# head of master
 head(master, 6)
+# tail of master
 tail(master, 6)
 ```
 
-3. Report the number of NA's in each column.
-<br /><b>Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero.</b>
+<b>Client Request:</b> Report the number of NA's in each column.
+<br />
+<b>Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero.</b>
 ```{r, echo=TRUE}
 sapply(master, function(x) sum(is.na(x)))
 
 ```
 
-4. Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
-<br /><b>The bar chart with the median ABV and IBU per state is given below.</b>
+<b>Client Request:</b> Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+<br />
+<b>Median ABV per State</b>
+The code calculates the median IBU by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
 ```{r, echo=TRUE}
 ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(ibu.med) <- c("State","IBU")
+
+
+
+par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
+barplot(ibu.med$IBU, 
+        names.arg = ibu.med$State, 
+        main = "Median IBU by State", 
+        xlab = "State", 
+        ylab = "Median IBU", 
+        col = "Blue",
+        beside = TRUE
+        )
+```
+<b>Median IBU per State</b>
+The code calculates the median ABV by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
+```{r, echo=TRUE}
 abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(abv.med) <- c("State","ABV")
 
-barplot(ibu.med$IBU, names.arg = ibu.med$State, beside = TRUE, main = "Median IBU by State", xlab = "State", ylab = "Median IBU", col = "Blue")
-barplot(abv.med$ABV, names.arg = abv.med$State, beside = TRUE, main = "Median ABV by State", xlab = "State", ylab = "Median ABV", col = "Blue")
+par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
+barplot(abv.med$ABV, 
+        names.arg = abv.med$State, 
+        beside = TRUE, 
+        main = "Median ABV by State", 
+        xlab = "State", 
+        ylab = "Median ABV", 
+        col = "Blue"
+        )
 ```
 
 5. Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?

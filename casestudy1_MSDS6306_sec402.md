@@ -1,5 +1,5 @@
 ---
-title: 'An Analysis of the Breweries and their Beers in the United States'
+title: 'Analysis of the Breweries and their Beers in the United States'
 author: "Caroll Rodriguez and Aaron Tomkins"
 date: "2/16/2018"
 output: 
@@ -7,27 +7,42 @@ output:
       keep_md: true
 ---
 #Introduction
-<p>Insert Introduction statement here</p>
+<p> </p>
 
-<b>Datasets</b>
-<p>The following code chunk pulls in two .csv files provided by the client into R. The files are then merged utilizing the Brewery Id as the Primary key. A series of steps to clean the data from abnormalities is performed. Then, column headings and data types for each column are normalized. A sample of the data is shown below.</p>
+<b>Dataset Provided</b>
+<p>Two datasets were provided by the client. One file contains a list of all Breweries in the US plus District of Columbia. 
+The other file contains a list of Breweries and the craft beers they produce with the ABV, IBV, and Style indication.
+
+<b>Data Merge and Cleaning</b>
+<p>The code we created imports the two .csv files, provided by the client, into a program called R. In the R program, these .csv files are merged utilizing the Brewery Id as the common field between the files. 
+Merging these files provides a complete list of Breweries and the craft beers they produce with associated attributes from both files. 
+A series of steps to clean the data from abnormalities is performed like the removal of whitespace, and column headings normalized. A sample of the data is shown below.</p>
 
 
 ```r
 # load Beers.csv, setting data types
 classProfile <- c("character", "integer", "numeric", "integer", "integer", "factor", "numeric")
 beers <- read.csv("Beers.csv", colClasses = classProfile, na.strings = "", strip.white = TRUE)
+
 # further specify Name column in beers
 names(beers)[names(beers) == "Name"] <- "Beer_Name"
 
 # load Breweries.csv, setting data types
 classProfile <- c("integer","character", "character", "factor")
 breweries <- read.csv("Breweries.csv", colClasses = classProfile, na.strings = "", strip.white = TRUE)
+
 # further specify Name column in breweries
 names(breweries)[names(breweries) == "Name"] <- "Brewery_Name"
 
+#merge of beers and breweries files
 master <- merge(beers, breweries, by.x="Brewery_id", by.y="Brew_ID", all=TRUE)
-sum(duplicated(master$Beer_ID)) # shows that the merge did not produce duplicates
+```
+
+<b>Number of duplicates in Master file</b>
+
+```r
+# shows that the merge did not produce duplicates
+sum(duplicated(master$Beer_ID)) 
 ```
 
 ```
@@ -37,69 +52,40 @@ sum(duplicated(master$Beer_ID)) # shows that the merge did not produce duplicate
 ```r
 # reorder columns
 master <- master[c("Beer_ID", "Beer_Name", "ABV", "IBU", "Style", "Ounces", "Brewery_id", "Brewery_Name", "City", "State" )]
+
 # normalize column names
 names(master)[names(master) == "Brewery_id"] <- "Brewery_ID"
+
 # sort rows by beer ID
 master <- master[order(master$Beer_ID),]
-
-# head and tail of master
-head(master, 6)
 ```
 
-```
-##      Beer_ID                Beer_Name   ABV IBU
-## 1021       1          Dale's Pale Ale 0.065  65
-## 1020       4        Gordon Ale (2009) 0.087  85
-## 1019       5                 Old Chub 0.080  35
-## 1018       6       GUBNA Imperial IPA 0.099 100
-## 1017       7 Mama's Little Yella Pils 0.053  35
-## 1016       8  Ten Fidy Imperial Stout 0.099  98
-##                               Style Ounces Brewery_ID        Brewery_Name
-## 1021        American Pale Ale (APA)     12        167 Oskar Blues Brewery
-## 1020 American Double / Imperial IPA     12        167 Oskar Blues Brewery
-## 1019                   Scottish Ale     12        167 Oskar Blues Brewery
-## 1018 American Double / Imperial IPA     12        167 Oskar Blues Brewery
-## 1017                 Czech Pilsener     12        167 Oskar Blues Brewery
-## 1016         Russian Imperial Stout     12        167 Oskar Blues Brewery
-##          City State
-## 1021 Longmont    CO
-## 1020 Longmont    CO
-## 1019 Longmont    CO
-## 1018 Longmont    CO
-## 1017 Longmont    CO
-## 1016 Longmont    CO
-```
-
-```r
-tail(master, 6)
-```
-
-```
-##   Beer_ID     Beer_Name   ABV IBU                               Style
-## 6    2687   Parapet ESB 0.056  47 Extra Special / Strong Bitter (ESB)
-## 5    2688    Stronghold 0.060  25                     American Porter
-## 4    2689       Pumpion 0.060  38                         Pumpkin Ale
-## 3    2690    Wall's End 0.048  19                   English Brown Ale
-## 2    2691 Maggie's Leap 0.049  26                  Milk / Sweet Stout
-## 1    2692  Get Together 0.045  50                        American IPA
-##   Ounces Brewery_ID      Brewery_Name        City State
-## 6     16          1 NorthGate Brewing Minneapolis    MN
-## 5     16          1 NorthGate Brewing Minneapolis    MN
-## 4     16          1 NorthGate Brewing Minneapolis    MN
-## 3     16          1 NorthGate Brewing Minneapolis    MN
-## 2     16          1 NorthGate Brewing Minneapolis    MN
-## 1     16          1 NorthGate Brewing Minneapolis    MN
-```
 
 # Analysis
 
-1. How many breweries are present in each state?
-<br /><b>Number of Breweries by State</b>
-<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO and CA.</p>
+<b>Client Request:</b> How many breweries are present in each state?
+<br />
+<b>Number of Breweries by State</b>
+<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO.</p>
 
 ```r
 unique.master <- master[!duplicated(master$Brewery_ID),]
-table(unique.master$State, useNA = "no")
+sort.unique.master <- table(unique.master$State, useNA = "no")
+sort(sort.unique.master, decreasing = TRUE)
+```
+
+```
+## 
+## CO CA MI OR TX PA MA WA IN WI NC IL NY VA FL OH MN AZ VT ME MO MT CT AK GA 
+## 47 39 32 29 28 25 23 23 22 20 19 18 16 16 15 15 12 11 10  9  9  9  8  7  7 
+## MD OK IA ID LA NE RI HI KY NM SC UT WY AL KS NH NJ TN AR DE MS NV DC ND SD 
+##  7  6  5  5  5  5  5  4  4  4  4  4  4  3  3  3  3  3  2  2  2  2  1  1  1 
+## WV 
+##  1
+```
+
+```r
+sort.unique.master
 ```
 
 ```
@@ -112,11 +98,12 @@ table(unique.master$State, useNA = "no")
 ##  4
 ```
 
-2. Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
-<br /><b>Printed below are the first and last 6 records of the merged dataset. This view allows us to check for abnormalities in the merged data.</b>
+<b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
+<br />
+<b>Sample of first and last 6 rows in Master file</b>
 
 ```r
-# The two tables were already merged in the data cleaning process (see first section above).
+# head of master
 head(master, 6)
 ```
 
@@ -145,6 +132,7 @@ head(master, 6)
 ```
 
 ```r
+# tail of master
 tail(master, 6)
 ```
 
@@ -165,8 +153,9 @@ tail(master, 6)
 ## 1     16          1 NorthGate Brewing Minneapolis    MN
 ```
 
-3. Report the number of NA's in each column.
-<br /><b>Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero.</b>
+<b>Client Request:</b> Report the number of NA's in each column.
+<br />
+<b>Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero.</b>
 
 ```r
 sapply(master, function(x) sum(is.na(x)))
@@ -179,25 +168,48 @@ sapply(master, function(x) sum(is.na(x)))
 ##            0            0            0            0            0
 ```
 
-4. Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
-<br /><b>The bar chart with the median ABV and IBU per state is given below.</b>
+<b>Client Request:</b> Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
+<br />
+<b>Median ABV per State</b>
+The code calculates the median IBU by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
 
 ```r
 ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(ibu.med) <- c("State","IBU")
+
+
+
+par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
+barplot(ibu.med$IBU, 
+        names.arg = ibu.med$State, 
+        main = "Median IBU by State", 
+        xlab = "State", 
+        ylab = "Median IBU", 
+        col = "Blue",
+        beside = TRUE
+        )
+```
+
+![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+<b>Median IBU per State</b>
+The code calculates the median ABV by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
+
+```r
 abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(abv.med) <- c("State","ABV")
 
-barplot(ibu.med$IBU, names.arg = ibu.med$State, beside = TRUE, main = "Median IBU by State", xlab = "State", ylab = "Median IBU", col = "Blue")
+par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
+barplot(abv.med$ABV, 
+        names.arg = abv.med$State, 
+        beside = TRUE, 
+        main = "Median ABV by State", 
+        xlab = "State", 
+        ylab = "Median ABV", 
+        col = "Blue"
+        )
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
-
-```r
-barplot(abv.med$ABV, names.arg = abv.med$State, beside = TRUE, main = "Median ABV by State", xlab = "State", ylab = "Median ABV", col = "Blue")
-```
-
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-4-2.png)<!-- -->
+![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
 
 5. Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
 <br /><b>Colorado has the maximum ABV and Oregon has the most bitter beer.</b>
@@ -238,4 +250,4 @@ summary(master$ABV)
 plot(master$ABV ~ master$IBU, main = "ABV to IBU", ylab = "ABV", xlab = "IBU")
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
