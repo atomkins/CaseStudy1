@@ -1,5 +1,5 @@
 ---
-title: 'An Analysis of the Breweries and their Beers in the United States'
+title: ' '
 author: "Caroll Rodriguez and Aaron Tomkins"
 date: "2/16/2018"
 output: 
@@ -10,7 +10,10 @@ output:
 <p>Insert Introduction statement here</p>
 
 <b>Datasets</b>
-<p>The following code chunk pulls in two .csv files provided by the client into R. The files are then merged utilizing the Brewery Id as the Primary key. A series of steps to clean the data from abnormalities is performed. Then, column headings and data types for each column are normalized. A sample of the data is shown below.</p>
+<p>
+We were provided two datasets by the client.
+
+<p>We built code that pulls in two .csv files, which were provided by the client, into a program called R. These .csv files were merged utilizing the Brewery Id as the Primary key. Merging these files provides a complete list of Breweries, their craft beers, A series of steps to clean the data from abnormalities is performed. Then, column headings and data types for each column are normalized. A sample of the data is shown below.</p>
 
 ```{r tidyData, echo=TRUE}
 # load Beers.csv, setting data types
@@ -61,6 +64,7 @@ tail(master, 6)
 <br /><b>Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero.</b>
 ```{r, echo=TRUE}
 sapply(master, function(x) sum(is.na(x)))
+
 ```
 
 4. Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
