@@ -15,17 +15,18 @@ output:
 ```{r tidyData, echo=TRUE}
 # load Beers.csv, setting data types
 classProfile <- c("character", "integer", "numeric", "integer", "integer", "factor", "numeric")
-beers <- read.csv("Beers.csv", colClasses = classProfile, na.strings = "")
+beers <- read.csv("Beers.csv", colClasses = classProfile, na.strings = "", strip.white = TRUE)
 # further specify Name column in beers
 names(beers)[names(beers) == "Name"] <- "Beer_Name"
 
 # load Breweries.csv, setting data types
 classProfile <- c("integer","character", "character", "factor")
-breweries <- read.csv("Breweries.csv", colClasses = classProfile, na.strings = "")
+breweries <- read.csv("Breweries.csv", colClasses = classProfile, na.strings = "", strip.white = TRUE)
 # further specify Name column in breweries
 names(breweries)[names(breweries) == "Name"] <- "Brewery_Name"
 
 master <- merge(beers, breweries, by.x="Brewery_id", by.y="Brew_ID", all=TRUE)
+sum(duplicated(master$Beer_ID)) # shows that the merge did not produce duplicates
 # reorder columns
 master <- master[c("Beer_ID", "Beer_Name", "ABV", "IBU", "Style", "Ounces", "Brewery_id", "Brewery_Name", "City", "State" )]
 # normalize column names
@@ -40,10 +41,12 @@ tail(master, 6)
 
 # Analysis
 
+1. How many breweries are present in each state?
 <br /><b>Number of Breweries by State</b>
 <p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO and CA.</p>
 ```{r, echo=TRUE}
-table(master$State, useNA = "no")
+unique.master <- master[!duplicated(master$Brewery_ID),]
+table(unique.master$State, useNA = "no")
 ```
 
 2. Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
