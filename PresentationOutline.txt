@@ -1,8 +1,9 @@
 Case Study 1 Outline:
 
-Introduction to Project
+Introduction
+  *describe the analysis, goal
 
-Statistics
+Analysis
   
 1.  Report the number of NA’s in each column
 2.  Number of Breweries by State
@@ -16,6 +17,8 @@ Summarize the findings
 
 Q&A
 
+Refrences
+ 
 Appendix
   code and definition of the code chunks
   
