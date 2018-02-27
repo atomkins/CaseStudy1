@@ -1,6 +1,6 @@
 ---
 title: 'Analysis of the Breweries and their Beers in the United States'
-author: "Caroll Rodriguez and Aaron Tomkins"
+author: "Caroll Rodriguez, Amy Paschal and Aaron Tomkins"
 date: "2/16/2018"
 output: 
     html_document:
@@ -60,10 +60,14 @@ master <- master[order(master$Beer_ID),]
 <b>Number of Breweries by State</b>
 <p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO.</p>
 ```{r, echo=TRUE}
+library(ggplot2)
 unique.master <- master[!duplicated(master$Brewery_ID),]
-sort.unique.master <- table(unique.master$State, useNA = "no")
-sort(sort.unique.master, decreasing = TRUE)
-sort.unique.master
+counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master,
+          FUN = function(x){NROW(x)})
+names(counted.master) <- c("State","Count")
+counted.master$State <- factor(counted.master$State, levels = counted.master$State[order(-counted.master$Count)])
+ggplot(counted.master, aes(x=State, y=Count)) +
+geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Breweries by State", x ="State", y = "Number of Breweries")
 ```
 
 <b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.</b>
@@ -94,15 +98,16 @@ The code calculates the median IBU by State with NA's removed and sets the colum
 ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(ibu.med) <- c("State","IBU")
 
-par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
-barplot(ibu.med$IBU, 
-        names.arg = ibu.med$State, 
-        main = "Median IBU by State", 
-        xlab = "State", 
-        ylab = "Median IBU", 
-        col = "Blue",
-        beside = TRUE
-        )
+# determine if any states are missing all IBU values
+ibu.na <- which(is.na(ibu.med$IBU))
+states.ibu.na <- ibu.med[ibu.na,c("State")]
+
+# remove states with no values in IBU
+ibu.med <- ibu.med[-ibu.na,]
+
+ggplot(ibu.med, aes(x=State, y=IBU)) +
+geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median IBU by State", x ="State", y = "Median IBU")
+
 ```
 <b>Median IBU per State</b>
 The code calculates the median ABV by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
@@ -110,15 +115,8 @@ The code calculates the median ABV by State with NA's removed and sets the colum
 abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(abv.med) <- c("State","ABV")
 
-par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
-barplot(abv.med$ABV, 
-        names.arg = abv.med$State, 
-        beside = TRUE, 
-        main = "Median ABV by State", 
-        xlab = "State", 
-        ylab = "Median ABV", 
-        col = "Blue"
-        )
+ggplot(abv.med, aes(x=State, y=ABV)) +
+geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median ABV by State", x ="State", y = "Median ABV")
 ```
 
 5. Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
@@ -136,5 +134,6 @@ summary(master$ABV)
 7. Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
 <br /><b>Per below, there is a positive linear relationship between ABV and IBU.</b>
 ```{r}
-plot(master$ABV ~ master$IBU, main = "ABV to IBU", ylab = "ABV", xlab = "IBU")
+ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="IBU", y = "ABV")
+
 ```
