@@ -66,9 +66,10 @@ sort(sort.unique.master, decreasing = TRUE)
 sort.unique.master
 ```
 
-<b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
+<b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.</b>
 <br />
-<b>Sample of first and last 6 rows in Master file</b>
+<b>Data Sample of merged files</b>
+Sample of first and last 6 rows in Master file
 ```{r echo=TRUE}
 # head of master
 head(master, 6)
@@ -78,7 +79,8 @@ tail(master, 6)
 
 <b>Client Request:</b> Report the number of NA's in each column.
 <br />
-<b>Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero.</b>
+<b>Number of NAs</b>
+Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero. NA represent missing data. We suggest these fields to be populated and resubmitted for analysis.
 ```{r, echo=TRUE}
 sapply(master, function(x) sum(is.na(x)))
 
@@ -91,8 +93,6 @@ The code calculates the median IBU by State with NA's removed and sets the colum
 ```{r, echo=TRUE}
 ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(ibu.med) <- c("State","IBU")
-
-
 
 par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
 barplot(ibu.med$IBU, 
