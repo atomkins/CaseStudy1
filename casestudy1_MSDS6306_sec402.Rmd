@@ -1,10 +1,11 @@
 ---
-title: 'Analysis of the Breweries and their Beers in the United States'
+title: "Analysis of the Breweries and their Beers in the United States"
 author: "Caroll Rodriguez, Amy Paschal and Aaron Tomkins"
 date: "2/16/2018"
-output: 
-    html_document:
-      keep_md: true
+output:
+  html_document:
+    keep_md: yes
+  pdf_document: default
 ---
 #Introduction
 <p> </p>
@@ -109,6 +110,9 @@ ggplot(ibu.med, aes(x=State, y=IBU)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median IBU by State", x ="State", y = "Median IBU")
 
 ```
+
+###### The following states had no available data for IBU and were therefore left out of the graph: `r states.ibu.na`
+
 <b>Median IBU per State</b>
 The code calculates the median ABV by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
 ```{r, echo=TRUE}
@@ -120,11 +124,12 @@ geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = elem
 ```
 
 5. Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
-<br /><b>Colorado has the maximum ABV and Oregon has the most bitter beer.</b>
 ```{r}
-master[which.max(master$ABV),][,10]
-master[which.max(master$IBU),][,10]
+ABV.row <- master[which.max(master$ABV),]
+IBU.row <- master[which.max(master$IBU),]
 ```
+##### `r ABV.row$State` has the maximum ABV with `r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name`.
+##### `r IBU.row$State` has the most bitter beer with `r IBU.row$Beer_Name` from `r IBU.row$Brewery_Name`.
 
 6. Summary statistics for the ABV variable.
 ```{r}
