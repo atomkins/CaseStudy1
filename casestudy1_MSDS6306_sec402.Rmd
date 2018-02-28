@@ -61,12 +61,20 @@ master <- master[order(master$Beer_ID),]
 <b>Number of Breweries by State</b>
 <p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO.</p>
 ```{r, echo=TRUE}
+# set up libraries and options
+library(knitr)
+library(kableExtra)
 library(ggplot2)
+options(knitr.table.format = "html") 
+
 unique.master <- master[!duplicated(master$Brewery_ID),]
-counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master,
-          FUN = function(x){NROW(x)})
+# count the number of rows for each state
+counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master, FUN = function(x){NROW(x)})
+# add column headers
 names(counted.master) <- c("State","Count")
+# sort by Count descending
 counted.master$State <- factor(counted.master$State, levels = counted.master$State[order(-counted.master$Count)])
+# plot
 ggplot(counted.master, aes(x=State, y=Count)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Breweries by State", x ="State", y = "Number of Breweries")
 ```
@@ -77,9 +85,9 @@ geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = elem
 Sample of first and last 6 rows in Master file
 ```{r echo=TRUE}
 # head of master
-head(master, 6)
+kable(head(master, 6), "markdown", row.names=FALSE, align="l", padding=2)
 # tail of master
-tail(master, 6)
+kable(tail(master, 6), "markdown", row.names=FALSE, align="l", padding=2)
 ```
 
 <b>Client Request:</b> Report the number of NA's in each column.
@@ -87,8 +95,9 @@ tail(master, 6)
 <b>Number of NAs</b>
 Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero. NA represent missing data. We suggest these fields to be populated and resubmitted for analysis.
 ```{r, echo=TRUE}
-sapply(master, function(x) sum(is.na(x)))
-
+na.counts <- data.frame(sapply(master, function(y) sum(length(which(is.na(y))))))
+names(na.counts) <- c("NA Count")
+kable(na.counts, "markdown", align="l", padding=2)
 ```
 
 <b>Client Request:</b> Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
@@ -133,7 +142,9 @@ IBU.row <- master[which.max(master$IBU),]
 
 6. Summary statistics for the ABV variable.
 ```{r}
-summary(master$ABV)
+my.summary <- data.frame(unclass(summary(master$ABV)))
+names(my.summary) <- c("Summary Stats")
+kable(my.summary, row.names=TRUE, digits=4)
 ```
 
 7. Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
