@@ -9,5 +9,6 @@
 
 ## Instructions
 1. Load Makefile.R into R studio.
+2. Run the following command from the R studio console: install.packages("kableExtra")
 2. Click on the Source button
 3. View output files of interest in your favorite text file reader or browser
