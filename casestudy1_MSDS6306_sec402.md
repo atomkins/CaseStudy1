@@ -70,7 +70,7 @@ master <- master[order(master$Beer_ID),]
 <b>Client Request:</b> How many breweries are present in each state?
 <br />
 <b>Number of Breweries by State</b>
-<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO.</p>
+
 
 ```r
 # set up libraries and options
@@ -86,12 +86,14 @@ counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master,
 names(counted.master) <- c("State","Count")
 # sort by Count descending
 counted.master$State <- factor(counted.master$State, levels = counted.master$State[order(-counted.master$Count)])
+
 # plot
 ggplot(counted.master, aes(x=State, y=Count)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Breweries by State", x ="State", y = "Number of Breweries")
 ```
 
 ![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in `r </p>
 
 <b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.</b>
 <br />
@@ -133,7 +135,7 @@ kable(tail(master, 6), "markdown", row.names=FALSE, align="l", padding=2)
 <b>Client Request:</b> Report the number of NA's in each column.
 <br />
 <b>Number of NAs</b>
-Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero. NA represent missing data. We suggest these fields to be populated and resubmitted for analysis.
+Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 items missing. We suggest these fields to be populated and resubmitted for analysis.
 
 ```r
 na.counts <- data.frame(sapply(master, function(y) sum(length(which(is.na(y))))))
@@ -159,7 +161,7 @@ kable(na.counts, "markdown", align="l", padding=2)
 <b>Client Request:</b> Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
 <br />
 <b>Median ABV per State</b>
-The code calculates the median IBU by State with missing data removed and sets the column names. A visual representation of this calculation is included in a bar chart.
+We have calculated the median (middle data point value in the list) ABV by State with missing data removed. A visual representation of this calculation is included in a bar chart.
 
 ```r
 ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
@@ -181,7 +183,7 @@ geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = elem
 ###### The following states had no available data for IBU and were therefore left out of the graph: SD
 
 <b>Median IBU per State</b>
-The code calculates the median ABV by State with missing data removed and sets the column names. A visual representation of this calculation is included in a bar chart.
+We have calculated the median (middle data point value in the list) IBU by State with missing data removed. A visual representation of this calculation is included in a bar chart.
 
 ```r
 abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
@@ -195,19 +197,21 @@ geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = elem
 </br>
 <b>Client Request:</b> Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
 <br />
-<b>Maximum Alcohol by Volume (ABV) and International Bitterness Unit (IBU) by State</b>
+<b>Maximum Alcohol by Volume (ABV) and maximum international Bitterness Unit (IBU) by State</b>
 
 ```r
 ABV.row <- master[which.max(master$ABV),]
 IBU.row <- master[which.max(master$IBU),]
 ```
+</br>
 <p>CO has the maximum ABV of 0.128 with Lee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Upslope Brewing Company. </p>
 <p>OR has the most bitter beer with a unit of 138 with Bitter Bitch Imperial IPA from Astoria Brewing Company. </P>
 
 </br>
 <b>Client Request:</b> Summary statistics for the ABV variable.
 <br />
-For the summary statistics below, we can conclude that the weakest beer by Alcohol by Volume is represented by Min and the beer with the most alcohol is represented by Max. The median, data point in the middle, represents even data points to above and below this number. 25% of the data points are below the 1st Qu. and above the 3rd Qu. There are 62 removed missing data points represented by NA's in the ABV column. 
+<br/>
+<p>For the summary statistics below, we can conclude that the range of ABV in beers is from Min to Max meaning the weakest beer by Alcohol by Volume is represented by Min and the beer with the most alcohol by volumn is represented by Max. The median, data point in the middle, represents even data points to above and below this number. 25% of the data points are below the 1st Qu. and above the 3rd Qu. There are 62 removed missing data points represented by NA's in the ABV column.</p>
 
 ```r
 my.summary <- data.frame(unclass(summary(master$ABV)))
@@ -260,8 +264,7 @@ Correlation <- cor.test(master$ABV,master$IBU)
 Cor.r <-  paste0(round(Correlation$estimate*100,1),"%", sep="")
 Cor.r2 <- paste0(round(Correlation$estimate^2,2)*100,"%", sep="")
 ```
-<br/>
-For the summary statistics below, we can conclude that the weakest beer by Alcohol by Volume is represented by Min and the beer with the most alcohol is represented by Max. The median, data point in the middle, represents even data points to above and below this number. 25% of the data points are below the 1st Qu. and above the 3rd Qu. There are 62 removed missing data points represented by NA's in the ABV column. 
+
 <br/>
 <b>Client Request:</b> Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
 <br /> 
@@ -280,4 +283,4 @@ ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="
 
 
 #Conclusion
-<p>In conclusion, we found that Dr. Santerre should take a trip to , CO and pickup theLee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Upslope Brewing Company which has the highest alcohol by volume. The next stop would be Astoria, OR to try outBitter Bitch Imperial IPA at Astoria Brewing Company. This beer has 138 bitterness Units and is sure to delight those taste buds. 
+<p>In conclusion, we found that Dr. Santerre should take a trip to , CO and pickup theLee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Upslope Brewing Company which has the highest alcohol by volume (0.128 ABV) of all beers in the list. The next stop would be Astoria, OR to try outBitter Bitch Imperial IPA at Astoria Brewing Company. This beer has 138 bitterness Units and is sure to delight those taste buds. 
