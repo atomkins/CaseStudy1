@@ -1,5 +1,5 @@
 ---
-title: "Analysis of the Breweries and their Beers in the United States"
+title: "The Next 'GoTo Beer'"
 author: "Caroll Rodriguez, Amy Paschal and Aaron Tomkins"
 date: "2/16/2018"
 output:
@@ -8,7 +8,8 @@ output:
   pdf_document: default
 ---
 #Introduction
-<p> </p>
+<p>The following analysis has been completed in order to find 'The Next GoTo Beer'. Our client, Dr. Santerre, is in need of a good beer and he has asked our team to complete an analysis on the list of breweries and beers in the United States.
+</p>
 
 <b>Dataset Provided</b>
 <p>Two datasets were provided by the client. One file contains a list of all Breweries in the US plus District of Columbia. 
@@ -131,8 +132,9 @@ names(abv.med) <- c("State","ABV")
 ggplot(abv.med, aes(x=State, y=ABV)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median ABV by State", x ="State", y = "Median ABV")
 ```
-
-5. Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
+<b>Client Request:</b> Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
+<br />
+<b>Maximum Alcohol by Volume (ABV) and International Bitterness Unit (IBU) by State</b>
 ```{r}
 ABV.row <- master[which.max(master$ABV),]
 IBU.row <- master[which.max(master$IBU),]
@@ -140,16 +142,20 @@ IBU.row <- master[which.max(master$IBU),]
 ##### `r ABV.row$State` has the maximum ABV with `r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name`.
 ##### `r IBU.row$State` has the most bitter beer with `r IBU.row$Beer_Name` from `r IBU.row$Brewery_Name`.
 
-6. Summary statistics for the ABV variable.
+<b>Client Request:</b> Summary statistics for the ABV variable.
+<br />
+<b>????
 ```{r}
 my.summary <- data.frame(unclass(summary(master$ABV)))
 names(my.summary) <- c("Summary Stats")
 kable(my.summary, row.names=TRUE, digits=4)
 ```
 
-7. Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
-<br /><b>Per below, there is a positive linear relationship between ABV and IBU.</b>
+<b>Client Request:</b> Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
+<br /><b>Per below, there is a positive linear relationship between ABV and IBU. It is estimated that r^2 = 44.9% of the variation in the ABV is explained by the IBU.</b>
 ```{r}
 ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="IBU", y = "ABV")
-
+cor.test(master$ABV,master$IBU)
 ```
+#Conclusion
+<p>
