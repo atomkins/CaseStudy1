@@ -8,9 +8,10 @@ Case Study 1: Beers and Breweries
 * RMarkdown/Presentation: Caroll, Feb 27
 
 ## Instructions
-1. Load Makefile.R into R studio.
+1. Start R Studio
 2. Run the following commands from the R studio console if you don't have these packages installed: 
 * install.packages("ggplot2")
 * install.packages("kableExtra")
-2. Click on the Source button
-3. View output files of interest in your favorite text file reader or browser
+3. Open Makefile.R in R Studio
+4. Click on the Source button
+5. View output files of interest in your favorite text file reader
