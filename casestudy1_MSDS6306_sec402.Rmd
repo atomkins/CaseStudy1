@@ -1,5 +1,5 @@
 ---
-title: "The Next 'GoTo Beer'"
+title: "The Next 'GoTo Beers'"
 author: "Caroll Rodriguez, Amy Paschal and Aaron Tomkins"
 date: "2/16/2018"
 output:
@@ -8,17 +8,18 @@ output:
   pdf_document: default
 ---
 #Introduction
-<p>The following analysis has been completed in order to find 'The Next GoTo Beer'. Our client, Dr. Santerre, is in need of a good beer and he has asked our team to complete an analysis on the list of breweries and beers in the United States.
+<p>The following analysis has been completed for our client, Dr. Santerre, who is in need of a good strong beer. He has asked our team to complete an analysis based on beer's alcohol content and bitterness level from a list of breweries in the United States. We will show you how we merged and cleaned the datasets provided. Then we will go thru a list of questions asked to finally determine which States hold the 'Next GoTo Beers' Dr. Santerre should try.
 </p>
 
-<b>Dataset Provided</b>
+<b>Dataset</b>
 <p>Two datasets were provided by the client. One file contains a list of all Breweries in the US plus District of Columbia. 
 The other file contains a list of Breweries and the craft beers they produce with the ABV, IBV, and Style indication.
 
 <b>Data Merge and Cleaning</b>
 <p>The code we created imports the two .csv files, provided by the client, into a program called R. In the R program, these .csv files are merged utilizing the Brewery Id as the common field between the files. 
 Merging these files provides a complete list of Breweries and the craft beers they produce with associated attributes from both files. 
-A series of steps to clean the data from abnormalities is performed like the removal of whitespace, and column headings normalized. A sample of the data is shown below.</p>
+A series of steps to clean the data from abnormalities is performed like the removal of whitespace, and column headings normalized. A sample of the data is shown below.
+</p>
 
 ```{r tidyData, echo=TRUE}
 # load Beers.csv, setting data types
@@ -40,6 +41,7 @@ master <- merge(beers, breweries, by.x="Brewery_id", by.y="Brew_ID", all=TRUE)
 ```
 
 <b>Number of duplicates in Master file</b>
+We have checked for any duplicate records in the Beer ID column. Each beer should only be listed once.
 ```{r echo=TRUE}
 # shows that the merge did not produce duplicates
 sum(duplicated(master$Beer_ID)) 
@@ -104,7 +106,7 @@ kable(na.counts, "markdown", align="l", padding=2)
 <b>Client Request:</b> Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
 <br />
 <b>Median ABV per State</b>
-The code calculates the median IBU by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
+The code calculates the median IBU by State with missing data removed and sets the column names. A visual representation of this calculation is included in a bar chart.
 ```{r, echo=TRUE}
 ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(ibu.med) <- c("State","IBU")
@@ -124,7 +126,7 @@ geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = elem
 ###### The following states had no available data for IBU and were therefore left out of the graph: `r states.ibu.na`
 
 <b>Median IBU per State</b>
-The code calculates the median ABV by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
+The code calculates the median ABV by State with missing data removed and sets the column names. A visual representation of this calculation is included in a bar chart.
 ```{r, echo=TRUE}
 abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(abv.med) <- c("State","ABV")
@@ -132,6 +134,7 @@ names(abv.med) <- c("State","ABV")
 ggplot(abv.med, aes(x=State, y=ABV)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median ABV by State", x ="State", y = "Median ABV")
 ```
+</br>
 <b>Client Request:</b> Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
 <br />
 <b>Maximum Alcohol by Volume (ABV) and International Bitterness Unit (IBU) by State</b>
@@ -139,23 +142,35 @@ geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = elem
 ABV.row <- master[which.max(master$ABV),]
 IBU.row <- master[which.max(master$IBU),]
 ```
-##### `r ABV.row$State` has the maximum ABV with `r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name`.
-##### `r IBU.row$State` has the most bitter beer with `r IBU.row$Beer_Name` from `r IBU.row$Brewery_Name`.
+<p>`r ABV.row$State` has the maximum ABV of `r ABV.row$ABV` with `r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name`. </p>
+<p>`r IBU.row$State` has the most bitter beer with a unit of `r IBU.row$IBU` with `r IBU.row$Beer_Name` from `r IBU.row$Brewery_Name`. </P>
 
+</br>
 <b>Client Request:</b> Summary statistics for the ABV variable.
 <br />
-<b>????
+For the summary statistics below, we can conclude that the weakest beer by Alcohol by Volume is represented by Min and the beer with the most alcohol is represented by Max. The median, data point in the middle, represents even data points to above and below this number. 25% of the data points are below the 1st Qu. and above the 3rd Qu. There are 62 removed missing data points represented by NA's in the ABV column. 
 ```{r}
 my.summary <- data.frame(unclass(summary(master$ABV)))
-names(my.summary) <- c("Summary Stats")
+names(my.summary) <- c("Summary Statistics")
 kable(my.summary, row.names=TRUE, digits=4)
-```
 
+#Correlation Coefficient (r) calculation
+Correlation <- cor.test(master$ABV,master$IBU)
+Cor.r <-  paste0(round(Correlation$estimate*100,1),"%", sep="")
+Cor.r2 <- paste0(round(Correlation$estimate^2,2)*100,"%", sep="")
+
+```
+<br/>
+For the summary statistics below, we can conclude that the weakest beer by Alcohol by Volume is represented by Min and the beer with the most alcohol is represented by Max. The median, data point in the middle, represents even data points to above and below this number. 25% of the data points are below the 1st Qu. and above the 3rd Qu. There are 62 removed missing data points represented by NA's in the ABV column. 
+<br/>
 <b>Client Request:</b> Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
-<br /><b>Per below, there is a positive linear relationship between ABV and IBU. It is estimated that r^2 = 44.9% of the variation in the ABV is explained by the IBU.</b>
+<br /> 
+There is a positive linear relationship between ABV and IBU. It is estimated that the strength of this liner relationship is `r Cor.r` and r^2 = `r Cor.r2` of the variation in ABV is explained by the IBU level.
+<br/>
 ```{r}
 ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="IBU", y = "ABV")
-cor.test(master$ABV,master$IBU)
 ```
+
+
 #Conclusion
-<p>
+<p>In conclusion, we found that Dr. Santerre should take a trip to `r ABV.row$city`, `r ABV.row$State` and pickup the`r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name` which has the highest alcohol by volume. The next stop would be `r IBU.row$City`, `r IBU.row$State` to try out`r IBU.row$Beer_Name` at `r IBU.row$Brewery_Name`. This beer has `r IBU.row$IBU` bitterness Units and is sure to delight those taste buds. 
