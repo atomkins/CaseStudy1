@@ -70,6 +70,10 @@ State | factor |  U.S. State where the brewery is located.
 #### HTML file created by running makefile.R
 
 # Instructions
-1. Load Makefile.R into R Studio
-2. Click on the Source button
-3. View output files of interest in your favorite text file reader
+1. Start R Studio
+2. Run the following commands from the R studio console if you don't have these packages installed: 
+* install.packages("ggplot2")
+* install.packages("kableExtra")
+3. Open Makefile.R in R Studio
+4. Click on the Source button
+5. View output files of interest in your favorite text file reader
