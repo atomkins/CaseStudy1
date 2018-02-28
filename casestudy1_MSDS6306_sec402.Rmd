@@ -8,7 +8,7 @@ output:
   pdf_document: default
 ---
 #Introduction
-<p>The following analysis has been completed for our client, Dr. Santerre, who is in need of a good strong beer. He has asked our team to complete an analysis based on beer's alcohol content and bitterness level from a list of breweries in the United States. We will show you how we merged and cleaned the datasets provided. Then we will go thru a list of questions asked to finally determine which States hold the 'Next GoTo Beers' Dr. Santerre should try.
+<p>The following analysis has been completed for our client, Dr. Santerre, who is in need of a good strong beer. He has asked our team to complete an analysis based on beer's alcohol content and bitterness level from a list of breweries in the United States. We will show you how we merged and cleaned the datasets provided. Then we will go through a list of questions asked to finally determine which States hold the 'Next GoTo Beers' Dr. Santerre should try.
 </p>
 
 <b>Dataset</b>
@@ -18,7 +18,7 @@ The other file contains a list of Breweries and the craft beers they produce wit
 <b>Data Merge and Cleaning</b>
 <p>The code we created imports the two .csv files, provided by the client, into a program called R. In the R program, these .csv files are merged utilizing the Brewery Id as the common field between the files. 
 Merging these files provides a complete list of Breweries and the craft beers they produce with associated attributes from both files. 
-A series of steps to clean the data from abnormalities is performed like the removal of whitespace, and column headings normalized. A sample of the data is shown below.
+A series of steps to clean the data from abnormalities was performed including conversion to data types that reflect the nature of the data, removal of whitespace, search for possible duplicates, and column headings normalized with duplicates removed. A sample of the data is shown below.
 </p>
 
 ```{r tidyData, echo=TRUE}
@@ -75,14 +75,16 @@ unique.master <- master[!duplicated(master$Brewery_ID),]
 counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master, FUN = function(x){NROW(x)})
 # add column headers
 names(counted.master) <- c("State","Count")
-# sort by Count descending
+# sort by Count descending in a way that makes ggplot happy
 counted.master$State <- factor(counted.master$State, levels = counted.master$State[order(-counted.master$Count)])
+# save the sorted order of the states
+sorted.states <- counted.master$State[order(-counted.master$Count)]
 
 # plot
 ggplot(counted.master, aes(x=State, y=Count)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Breweries by State", x ="State", y = "Number of Breweries")
 ```
-<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in `r </p>
+<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States by state. We can see there is a heavy concentration of craft beer breweries in `r sorted.states[1]`.</p>
 
 <b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.</b>
 <br />
@@ -120,6 +122,9 @@ states.ibu.na <- ibu.med[ibu.na,c("State")]
 # remove states with no values in IBU
 ibu.med <- ibu.med[-ibu.na,]
 
+# sort by IBU descending in a way that makes ggplot happy
+ibu.med$State <- factor(ibu.med$State, levels = ibu.med$State[order(-ibu.med$IBU)])
+
 ggplot(ibu.med, aes(x=State, y=IBU)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median IBU by State", x ="State", y = "Median IBU")
 
@@ -132,6 +137,9 @@ We have calculated the median (middle data point value in the list) IBU by State
 ```{r, echo=TRUE}
 abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(abv.med) <- c("State","ABV")
+
+# sort by ABV descending in a way that makes ggplot happy
+abv.med$State <- factor(abv.med$State, levels = abv.med$State[order(-abv.med$ABV)])
 
 ggplot(abv.med, aes(x=State, y=ABV)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median ABV by State", x ="State", y = "Median ABV")
@@ -168,7 +176,7 @@ Cor.r2 <- paste0(round(Correlation$estimate^2,2)*100,"%", sep="")
 <br/>
 <b>Client Request:</b> Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
 <br /> 
-There is a positive linear relationship between ABV and IBU. It is estimated that the strength of this liner relationship is `r Cor.r` and r^2 = `r Cor.r2` of the variation in ABV is explained by the IBU level.
+There is a positive linear relationship between ABV and IBU. In other words, in general, the higher the alcohol content, the more bitter the beer (and vice versa). It is estimated that the strength of this liner relationship is `r Cor.r` and r^2 = `r Cor.r2` of the variation in ABV is explained by the IBU level.
 <br/>
 ```{r}
 ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="IBU", y = "ABV")
@@ -176,4 +184,4 @@ ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="
 
 
 #Conclusion
-<p>In conclusion, we found that Dr. Santerre should take a trip to `r ABV.row$city`, `r ABV.row$State` and pickup the`r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name` which has the highest alcohol by volume (`r ABV.row$ABV` ABV) of all beers in the list. The next stop would be `r IBU.row$City`, `r IBU.row$State` to try out`r IBU.row$Beer_Name` at `r IBU.row$Brewery_Name`. This beer has `r IBU.row$IBU` bitterness Units and is sure to delight those taste buds. 
+<p>In conclusion, we found that Dr. Santerre should take a trip to `r ABV.row$City`, `r ABV.row$State` and pick up the `r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name` which has the highest alcohol by volume (`r ABV.row$ABV` ABV) of all beers in the list. The next stop would be `r IBU.row$City`, `r IBU.row$State` to try out `r IBU.row$Beer_Name` at `r IBU.row$Brewery_Name`. This beer has `r IBU.row$IBU` bitterness Units and is sure to delight those taste buds. 
