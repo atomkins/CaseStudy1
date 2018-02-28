@@ -1,10 +1,11 @@
 ---
-title: 'Analysis of the Breweries and their Beers in the United States'
-author: "Caroll Rodriguez and Aaron Tomkins"
+title: "Analysis of the Breweries and their Beers in the United States"
+author: "Caroll Rodriguez, Amy Paschal and Aaron Tomkins"
 date: "2/16/2018"
-output: 
-    html_document:
-      keep_md: true
+output:
+  html_document:
+    keep_md: yes
+  pdf_document: default
 ---
 #Introduction
 <p> </p>
@@ -69,103 +70,70 @@ master <- master[order(master$Beer_ID),]
 <p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in CO.</p>
 
 ```r
-unique.master <- master[!duplicated(master$Brewery_ID),]
-sort.unique.master <- table(unique.master$State, useNA = "no")
-sort(sort.unique.master, decreasing = TRUE)
+# set up libraries and options
+library(knitr)
 ```
 
 ```
-## 
-## CO CA MI OR TX PA MA WA IN WI NC IL NY VA FL OH MN AZ VT ME MO MT CT AK GA 
-## 47 39 32 29 28 25 23 23 22 20 19 18 16 16 15 15 12 11 10  9  9  9  8  7  7 
-## MD OK IA ID LA NE RI HI KY NM SC UT WY AL KS NH NJ TN AR DE MS NV DC ND SD 
-##  7  6  5  5  5  5  5  4  4  4  4  4  4  3  3  3  3  3  2  2  2  2  1  1  1 
-## WV 
-##  1
+## Error in value[[3L]](cond): Package 'knitr' version 1.17 cannot be unloaded:
+##  Error in unloadNamespace(package) : namespace 'knitr' is imported by 'rmarkdown' so cannot be unloaded
 ```
 
 ```r
-sort.unique.master
+library(kableExtra)
+library(ggplot2)
+options(knitr.table.format = "html") 
+
+unique.master <- master[!duplicated(master$Brewery_ID),]
+# count the number of rows for each state
+counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master, FUN = function(x){NROW(x)})
+# add column headers
+names(counted.master) <- c("State","Count")
+# sort by Count descending
+counted.master$State <- factor(counted.master$State, levels = counted.master$State[order(-counted.master$Count)])
+# plot
+ggplot(counted.master, aes(x=State, y=Count)) +
+geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Breweries by State", x ="State", y = "Number of Breweries")
 ```
 
-```
-## 
-## AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA MA MD ME MI MN MO 
-##  7  3  2 11 39 47  8  1  2 15  7  4  5  5 18 22  3  4  5 23  7  9 32 12  9 
-## MS MT NC ND NE NH NJ NM NV NY OH OK OR PA RI SC SD TN TX UT VA VT WA WI WV 
-##  2  9 19  1  5  3  3  4  2 16 15  6 29 25  5  4  1  3 28  4 16 10 23 20  1 
-## WY 
-##  4
-```
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
 
-<b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.
+<b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.</b>
 <br />
-<b>Sample of first and last 6 rows in Master file</b>
+<b>Data Sample of merged files</b>
+Sample of first and last 6 rows in Master file
 
 ```r
 # head of master
-head(master, 6)
+kable(head(master, 6), "markdown", row.names=FALSE, align="l", padding=2)
 ```
 
 ```
-##      Beer_ID                Beer_Name   ABV IBU
-## 1021       1          Dale's Pale Ale 0.065  65
-## 1020       4        Gordon Ale (2009) 0.087  85
-## 1019       5                 Old Chub 0.080  35
-## 1018       6       GUBNA Imperial IPA 0.099 100
-## 1017       7 Mama's Little Yella Pils 0.053  35
-## 1016       8  Ten Fidy Imperial Stout 0.099  98
-##                               Style Ounces Brewery_ID        Brewery_Name
-## 1021        American Pale Ale (APA)     12        167 Oskar Blues Brewery
-## 1020 American Double / Imperial IPA     12        167 Oskar Blues Brewery
-## 1019                   Scottish Ale     12        167 Oskar Blues Brewery
-## 1018 American Double / Imperial IPA     12        167 Oskar Blues Brewery
-## 1017                 Czech Pilsener     12        167 Oskar Blues Brewery
-## 1016         Russian Imperial Stout     12        167 Oskar Blues Brewery
-##          City State
-## 1021 Longmont    CO
-## 1020 Longmont    CO
-## 1019 Longmont    CO
-## 1018 Longmont    CO
-## 1017 Longmont    CO
-## 1016 Longmont    CO
+## Error in kable(head(master, 6), "markdown", row.names = FALSE, align = "l", : could not find function "kable"
 ```
 
 ```r
 # tail of master
-tail(master, 6)
+kable(tail(master, 6), "markdown", row.names=FALSE, align="l", padding=2)
 ```
 
 ```
-##   Beer_ID     Beer_Name   ABV IBU                               Style
-## 6    2687   Parapet ESB 0.056  47 Extra Special / Strong Bitter (ESB)
-## 5    2688    Stronghold 0.060  25                     American Porter
-## 4    2689       Pumpion 0.060  38                         Pumpkin Ale
-## 3    2690    Wall's End 0.048  19                   English Brown Ale
-## 2    2691 Maggie's Leap 0.049  26                  Milk / Sweet Stout
-## 1    2692  Get Together 0.045  50                        American IPA
-##   Ounces Brewery_ID      Brewery_Name        City State
-## 6     16          1 NorthGate Brewing Minneapolis    MN
-## 5     16          1 NorthGate Brewing Minneapolis    MN
-## 4     16          1 NorthGate Brewing Minneapolis    MN
-## 3     16          1 NorthGate Brewing Minneapolis    MN
-## 2     16          1 NorthGate Brewing Minneapolis    MN
-## 1     16          1 NorthGate Brewing Minneapolis    MN
+## Error in kable(tail(master, 6), "markdown", row.names = FALSE, align = "l", : could not find function "kable"
 ```
 
 <b>Client Request:</b> Report the number of NA's in each column.
 <br />
-<b>Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero.</b>
+<b>Number of NAs</b>
+Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 NAs. All other columns have zero. NA represent missing data. We suggest these fields to be populated and resubmitted for analysis.
 
 ```r
-sapply(master, function(x) sum(is.na(x)))
+na.counts <- data.frame(sapply(master, function(y) sum(length(which(is.na(y))))))
+names(na.counts) <- c("NA Count")
+kable(na.counts, "markdown", align="l", padding=2)
 ```
 
 ```
-##      Beer_ID    Beer_Name          ABV          IBU        Style 
-##            0            0           62         1005            5 
-##       Ounces   Brewery_ID Brewery_Name         City        State 
-##            0            0            0            0            0
+## Error in kable(na.counts, "markdown", align = "l", padding = 2): could not find function "kable"
 ```
 
 <b>Client Request:</b> Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
@@ -177,20 +145,21 @@ The code calculates the median IBU by State with NA's removed and sets the colum
 ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(ibu.med) <- c("State","IBU")
 
+# determine if any states are missing all IBU values
+ibu.na <- which(is.na(ibu.med$IBU))
+states.ibu.na <- ibu.med[ibu.na,c("State")]
 
+# remove states with no values in IBU
+ibu.med <- ibu.med[-ibu.na,]
 
-par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
-barplot(ibu.med$IBU, 
-        names.arg = ibu.med$State, 
-        main = "Median IBU by State", 
-        xlab = "State", 
-        ylab = "Median IBU", 
-        col = "Blue",
-        beside = TRUE
-        )
+ggplot(ibu.med, aes(x=State, y=IBU)) +
+geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median IBU by State", x ="State", y = "Median IBU")
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+
+###### The following states had no available data for IBU and were therefore left out of the graph: SD
+
 <b>Median IBU per State</b>
 The code calculates the median ABV by State with NA's removed and sets the column names. A visual representation of this calculation is included in a bar chart.
 
@@ -198,56 +167,42 @@ The code calculates the median ABV by State with NA's removed and sets the colum
 abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(abv.med) <- c("State","ABV")
 
-par(mar=c(5,4,4,0)) #set margin c(bottom, left, top, right)
-barplot(abv.med$ABV, 
-        names.arg = abv.med$State, 
-        beside = TRUE, 
-        main = "Median ABV by State", 
-        xlab = "State", 
-        ylab = "Median ABV", 
-        col = "Blue"
-        )
+ggplot(abv.med, aes(x=State, y=ABV)) +
+geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median ABV by State", x ="State", y = "Median ABV")
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png)
 
 5. Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
-<br /><b>Colorado has the maximum ABV and Oregon has the most bitter beer.</b>
 
 ```r
-master[which.max(master$ABV),][,10]
+ABV.row <- master[which.max(master$ABV),]
+IBU.row <- master[which.max(master$IBU),]
 ```
-
-```
-## [1] CO
-## 51 Levels: AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA ... WY
-```
-
-```r
-master[which.max(master$IBU),][,10]
-```
-
-```
-## [1] OR
-## 51 Levels: AK AL AR AZ CA CO CT DC DE FL GA HI IA ID IL IN KS KY LA ... WY
-```
+##### CO has the maximum ABV with Lee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Upslope Brewing Company.
+##### OR has the most bitter beer with Bitter Bitch Imperial IPA from Astoria Brewing Company.
 
 6. Summary statistics for the ABV variable.
 
 ```r
-summary(master$ABV)
+my.summary <- data.frame(unclass(summary(master$ABV)))
+names(my.summary) <- c("Summary Stats")
+kable(my.summary, row.names=TRUE, digits=4)
 ```
 
 ```
-##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
-## 0.00100 0.05000 0.05600 0.05977 0.06700 0.12800      62
+## Error in kable(my.summary, row.names = TRUE, digits = 4): could not find function "kable"
 ```
 
 7. Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
 <br /><b>Per below, there is a positive linear relationship between ABV and IBU.</b>
 
 ```r
-plot(master$ABV ~ master$IBU, main = "ABV to IBU", ylab = "ABV", xlab = "IBU")
+ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="IBU", y = "ABV")
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+```
+## Warning: Removed 1005 rows containing missing values (geom_point).
+```
+
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png)
