@@ -296,3 +296,6 @@ ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="
 
 #Conclusion
 <p>In conclusion, we found that Dr. Santerre should take a trip to Boulder, CO and pick up the Lee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Upslope Brewing Company which has the highest alcohol by volume (0.128 ABV) of all beers in the list. The next stop would be Astoria, OR to try out Bitter Bitch Imperial IPA at Astoria Brewing Company. This beer has 138 bitterness Units and is sure to delight those taste buds. 
+
+________________________________________________________________________________________________________________________________________________________________________           
+####GitHub: https://github.com/atomkins/CaseStudy1.git

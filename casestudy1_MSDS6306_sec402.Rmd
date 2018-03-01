@@ -189,3 +189,6 @@ ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="
 
 #Conclusion
 <p>In conclusion, we found that Dr. Santerre should take a trip to `r ABV.row$City`, `r ABV.row$State` and pick up the `r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name` which has the highest alcohol by volume (`r ABV.row$ABV` ABV) of all beers in the list. The next stop would be `r IBU.row$City`, `r IBU.row$State` to try out `r IBU.row$Beer_Name` at `r IBU.row$Brewery_Name`. This beer has `r IBU.row$IBU` bitterness Units and is sure to delight those taste buds. 
+
+________________________________________________________________________________________________________________________________________________________________________           
+####GitHub: https://github.com/atomkins/CaseStudy1.git
