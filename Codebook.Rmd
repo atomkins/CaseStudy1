@@ -2,7 +2,10 @@
 title: 'Codebook for Case Study 1: Beer and Breweries'
 author: "Caroll Rodriguez, Amy Paschal, Aaron Tomkins"
 date: "2/16/2018"
-output: html_document
+output:
+  html_document:
+    keep_md: yes
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
