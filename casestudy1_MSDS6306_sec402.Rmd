@@ -63,6 +63,7 @@ master <- master[order(master$Beer_ID),]
 <br />
 <b>Number of Breweries by State</b>
 
+
 ```{r, echo=TRUE}
 # set up libraries and options
 library(knitr)
@@ -79,28 +80,32 @@ names(counted.master) <- c("State","Count")
 counted.master$State <- factor(counted.master$State, levels = counted.master$State[order(-counted.master$Count)])
 # save the sorted order of the states
 sorted.states <- counted.master$State[order(-counted.master$Count)]
-
+```
+<p>The bar chart below shows the number of distinct breweries currently producing craft beers in the United States by state. We can see there is a heavy concentration of craft beer breweries in `r sorted.states[1]`.</p>
+```{r}
 # plot
 ggplot(counted.master, aes(x=State, y=Count)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Breweries by State", x ="State", y = "Number of Breweries")
 ```
-<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States by state. We can see there is a heavy concentration of craft beer breweries in `r sorted.states[1]`.</p>
-
+</br>
 <b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.</b>
-<br />
-<b>Data Sample of merged files</b>
-Sample of first and last 6 rows in Master file
+<br/>
+<b>Sample of Master File</b>
+
+Sample of first and last 6 rows in Master file.
 ```{r echo=TRUE}
 # head of master
 kable(head(master, 6), "markdown", row.names=FALSE, align="l", padding=2)
+
 # tail of master
 kable(tail(master, 6), "markdown", row.names=FALSE, align="l", padding=2)
 ```
 
 <b>Client Request:</b> Report the number of NA's in each column.
-<br />
+<br/>
 <b>Number of NAs</b>
-Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 items missing. We suggest these fields to be populated and resubmitted for analysis.
+<br/>
+Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 cells missing. The rest of the analysis will exclude these missing values. We suggest these fields to be populated and resubmitted for analysis.
 ```{r, echo=TRUE}
 na.counts <- data.frame(sapply(master, function(y) sum(length(which(is.na(y))))))
 names(na.counts) <- c("NA Count")
@@ -108,8 +113,9 @@ kable(na.counts, "markdown", align="l", padding=2)
 ```
 
 <b>Client Request:</b> Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
-<br />
+<br/>
 <b>Median ABV per State</b>
+<br/>
 We have calculated the median (middle data point value in the list) ABV by State with missing data removed. A visual representation of this calculation is included in a bar chart.
 ```{r, echo=TRUE}
 ibu.med <- aggregate(master$IBU, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
@@ -129,8 +135,7 @@ ggplot(ibu.med, aes(x=State, y=IBU)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median IBU by State", x ="State", y = "Median IBU")
 
 ```
-
-###### The following states had no available data for IBU and were therefore left out of the graph: `r states.ibu.na`
+<p>The following states had no available data for IBU and were therefore left out of the graph: `r states.ibu.na`</p>
 
 <b>Median IBU per State</b>
 We have calculated the median (middle data point value in the list) IBU by State with missing data removed. A visual representation of this calculation is included in a bar chart.
@@ -155,7 +160,6 @@ IBU.row <- master[which.max(master$IBU),]
 </br>
 <p>`r ABV.row$State` has the maximum ABV of `r ABV.row$ABV` with `r ABV.row$Beer_Name` from `r ABV.row$Brewery_Name`. </p>
 <p>`r IBU.row$State` has the most bitter beer with a unit of `r IBU.row$IBU` with `r IBU.row$Beer_Name` from `r IBU.row$Brewery_Name`. </P>
-
 </br>
 <b>Client Request:</b> Summary statistics for the ABV variable.
 <br />
@@ -176,7 +180,7 @@ Cor.r2 <- paste0(round(Correlation$estimate^2,2)*100,"%", sep="")
 <br/>
 <b>Client Request:</b> Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
 <br /> 
-There is a positive linear relationship between ABV and IBU. In other words, in general, the higher the alcohol content, the more bitter the beer (and vice versa). It is estimated that the strength of this liner relationship is `r Cor.r` and r^2 = `r Cor.r2` of the variation in ABV is explained by the IBU level.
+There is a positive linear relationship between ABV and IBU. In other words, in general, the higher the alcohol content, the more bitter the beer (and vice versa). It is estimated that the strength of this liner relationship is `r Cor.r` and r^2 = `r Cor.r2` of the variation in ABV is explained by the IBU levels.
 <br/>
 ```{r}
 ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="IBU", y = "ABV")

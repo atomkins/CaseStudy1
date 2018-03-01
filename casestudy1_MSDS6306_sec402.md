@@ -8,7 +8,7 @@ output:
   pdf_document: default
 ---
 #Introduction
-<p>The following analysis has been completed for our client, Dr. Santerre, who is in need of a good strong beer. He has asked our team to complete an analysis based on beer's alcohol content and bitterness level from a list of breweries in the United States. We will show you how we merged and cleaned the datasets provided. Then we will go thru a list of questions asked to finally determine which States hold the 'Next GoTo Beers' Dr. Santerre should try.
+<p>The following analysis has been completed for our client, Dr. Santerre, who is in need of a good strong beer. He has asked our team to complete an analysis based on beer's alcohol content and bitterness level from a list of breweries in the United States. We will show you how we merged and cleaned the datasets provided. Then we will go through a list of questions asked to finally determine which States hold the 'Next GoTo Beers' Dr. Santerre should try.
 </p>
 
 <b>Dataset</b>
@@ -18,7 +18,7 @@ The other file contains a list of Breweries and the craft beers they produce wit
 <b>Data Merge and Cleaning</b>
 <p>The code we created imports the two .csv files, provided by the client, into a program called R. In the R program, these .csv files are merged utilizing the Brewery Id as the common field between the files. 
 Merging these files provides a complete list of Breweries and the craft beers they produce with associated attributes from both files. 
-A series of steps to clean the data from abnormalities is performed like the removal of whitespace, and column headings normalized. A sample of the data is shown below.
+A series of steps to clean the data from abnormalities was performed including conversion to data types that reflect the nature of the data, removal of whitespace, search for possible duplicates, and column headings normalized with duplicates removed. A sample of the data is shown below.
 </p>
 
 
@@ -72,6 +72,7 @@ master <- master[order(master$Beer_ID),]
 <b>Number of Breweries by State</b>
 
 
+
 ```r
 # set up libraries and options
 library(knitr)
@@ -84,21 +85,26 @@ unique.master <- master[!duplicated(master$Brewery_ID),]
 counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master, FUN = function(x){NROW(x)})
 # add column headers
 names(counted.master) <- c("State","Count")
-# sort by Count descending
+# sort by Count descending in a way that makes ggplot happy
 counted.master$State <- factor(counted.master$State, levels = counted.master$State[order(-counted.master$Count)])
+# save the sorted order of the states
+sorted.states <- counted.master$State[order(-counted.master$Count)]
+```
+<p>The bar chart below shows the number of distinct breweries currently producing craft beers in the United States by state. We can see there is a heavy concentration of craft beer breweries in CO.</p>
 
+```r
 # plot
 ggplot(counted.master, aes(x=State, y=Count)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Breweries by State", x ="State", y = "Number of Breweries")
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
-<p>The summary table below shows the number of distinct breweries currently producing craft beers in the United States. We can see there is a heavy concentration of craft beer breweries in `r </p>
-
+![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+</br>
 <b>Client Request:</b> Merge beer data with the breweries data. Print the first 6 observations and the last six observations to check the merged file.</b>
-<br />
-<b>Data Sample of merged files</b>
-Sample of first and last 6 rows in Master file
+<br/>
+<b>Sample of Master File</b>
+
+Sample of first and last 6 rows in Master file.
 
 ```r
 # head of master
@@ -133,9 +139,10 @@ kable(tail(master, 6), "markdown", row.names=FALSE, align="l", padding=2)
 |2692     |Get Together   |0.045  |50   |American IPA                         |16      |1           |NorthGate Brewing  |Minneapolis  |MN     |
 
 <b>Client Request:</b> Report the number of NA's in each column.
-<br />
+<br/>
 <b>Number of NAs</b>
-Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 items missing. We suggest these fields to be populated and resubmitted for analysis.
+<br/>
+Per below, the ABV column has 62, the IBU column has 1005, and the Style column has 5 cells missing. The rest of the analysis will exclude these missing values. We suggest these fields to be populated and resubmitted for analysis.
 
 ```r
 na.counts <- data.frame(sapply(master, function(y) sum(length(which(is.na(y))))))
@@ -159,8 +166,9 @@ kable(na.counts, "markdown", align="l", padding=2)
 |State         |0         |
 
 <b>Client Request:</b> Compute the median alcohol content and international bitterness unit for each state. Plot a bar chart to compare.
-<br />
+<br/>
 <b>Median ABV per State</b>
+<br/>
 We have calculated the median (middle data point value in the list) ABV by State with missing data removed. A visual representation of this calculation is included in a bar chart.
 
 ```r
@@ -174,13 +182,15 @@ states.ibu.na <- ibu.med[ibu.na,c("State")]
 # remove states with no values in IBU
 ibu.med <- ibu.med[-ibu.na,]
 
+# sort by IBU descending in a way that makes ggplot happy
+ibu.med$State <- factor(ibu.med$State, levels = ibu.med$State[order(-ibu.med$IBU)])
+
 ggplot(ibu.med, aes(x=State, y=IBU)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median IBU by State", x ="State", y = "Median IBU")
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-5-1.png)<!-- -->
-
-###### The following states had no available data for IBU and were therefore left out of the graph: SD
+![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+<p>The following states had no available data for IBU and were therefore left out of the graph: SD</p>
 
 <b>Median IBU per State</b>
 We have calculated the median (middle data point value in the list) IBU by State with missing data removed. A visual representation of this calculation is included in a bar chart.
@@ -189,11 +199,14 @@ We have calculated the median (middle data point value in the list) IBU by State
 abv.med <- aggregate(master$ABV, by = list(master$State), FUN = function(x) median(x, na.rm = TRUE))
 names(abv.med) <- c("State","ABV")
 
+# sort by ABV descending in a way that makes ggplot happy
+abv.med$State <- factor(abv.med$State, levels = abv.med$State[order(-abv.med$ABV)])
+
 ggplot(abv.med, aes(x=State, y=ABV)) +
 geom_bar(stat="identity", fill="steelblue", width=.7) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title="Median ABV by State", x ="State", y = "Median ABV")
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
 </br>
 <b>Client Request:</b> Which state has the maximum alcoholic (ABV) beer? Which state as the most bitter (IBU) beer?
 <br />
@@ -206,7 +219,6 @@ IBU.row <- master[which.max(master$IBU),]
 </br>
 <p>CO has the maximum ABV of 0.128 with Lee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Upslope Brewing Company. </p>
 <p>OR has the most bitter beer with a unit of 138 with Bitter Bitch Imperial IPA from Astoria Brewing Company. </P>
-
 </br>
 <b>Client Request:</b> Summary statistics for the ABV variable.
 <br />
@@ -268,7 +280,7 @@ Cor.r2 <- paste0(round(Correlation$estimate^2,2)*100,"%", sep="")
 <br/>
 <b>Client Request:</b> Is there an apparent relationship between the bitterness of the beer and its alcoholic content? Draw a scatter plot.
 <br /> 
-There is a positive linear relationship between ABV and IBU. It is estimated that the strength of this liner relationship is 67.1% and r^2 = 45% of the variation in ABV is explained by the IBU level.
+There is a positive linear relationship between ABV and IBU. In other words, in general, the higher the alcohol content, the more bitter the beer (and vice versa). It is estimated that the strength of this liner relationship is 67.1% and r^2 = 45% of the variation in ABV is explained by the IBU levels.
 <br/>
 
 ```r
@@ -279,8 +291,8 @@ ggplot(master, aes(x=IBU, y=ABV)) + geom_point() + labs(title="ABV to IBU", x ="
 ## Warning: Removed 1005 rows containing missing values (geom_point).
 ```
 
-![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](casestudy1_MSDS6306_sec402_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 
 #Conclusion
-<p>In conclusion, we found that Dr. Santerre should take a trip to , CO and pickup theLee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Upslope Brewing Company which has the highest alcohol by volume (0.128 ABV) of all beers in the list. The next stop would be Astoria, OR to try outBitter Bitch Imperial IPA at Astoria Brewing Company. This beer has 138 bitterness Units and is sure to delight those taste buds. 
+<p>In conclusion, we found that Dr. Santerre should take a trip to Boulder, CO and pick up the Lee Hill Series Vol. 5 - Belgian Style Quadrupel Ale from Upslope Brewing Company which has the highest alcohol by volume (0.128 ABV) of all beers in the list. The next stop would be Astoria, OR to try out Bitter Bitch Imperial IPA at Astoria Brewing Company. This beer has 138 bitterness Units and is sure to delight those taste buds. 
