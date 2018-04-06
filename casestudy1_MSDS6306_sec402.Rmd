@@ -69,11 +69,14 @@ master <- master[order(master$Beer_ID),]
 library(knitr)
 library(kableExtra)
 library(ggplot2)
+library(dplyr)
 options(knitr.table.format = "html") 
 
 unique.master <- master[!duplicated(master$Brewery_ID),]
 # count the number of rows for each state
-counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master, FUN = function(x){NROW(x)})
+# counted.master <- aggregate(c(count = Brewery_ID) ~ State, data = unique.master, FUN = function(x){NROW(x)})
+counted.master <- data.frame(summary(unique.master$State))
+counted.master <- add_rownames(counted.master, "State")
 # add column headers
 names(counted.master) <- c("State","Count")
 # sort by Count descending in a way that makes ggplot happy
